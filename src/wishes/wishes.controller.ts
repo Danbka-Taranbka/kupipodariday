@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req } from '@nestjs/common';
 import { WishesService } from './wishes.service';
 import { CreateWishDto } from './dto/create-wish.dto';
 import { UpdateWishDto } from './dto/update-wish.dto';
@@ -8,13 +8,13 @@ export class WishesController {
   constructor(private readonly wishesService: WishesService) {}
 
   @Post()
-  create(@Body() createWishDto: CreateWishDto) {
-    return this.wishesService.create(createWishDto);
+  create(@Body() createWishDto: CreateWishDto, @Req() req) {
+    return this.wishesService.create(createWishDto, +req.user.id);
   }
 
   @Get()
-  findAll() {
-    return this.wishesService.findAll();
+  findAll(@Req() req) {
+    return this.wishesService.findAll(+req.user.id);
   }
 
   @Get(':id')

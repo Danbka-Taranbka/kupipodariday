@@ -1,26 +1,56 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateWishDto } from './dto/create-wish.dto';
 import { UpdateWishDto } from './dto/update-wish.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Wish } from './entities/wish.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class WishesService {
-  create(createWishDto: CreateWishDto) {
-    return 'This action adds a new wish';
+  constructor(
+    @InjectRepository(Wish)
+    private wishesRepository: Repository<Wish>,
+  ) {}
+  async create(createWishDto: CreateWishDto, ownerId: number): Promise<Wish> {
+    const wish = await this.wishesRepository.create({
+      ...createWishDto,
+      owner: {id: ownerId},
+    });
+    return await this.wishesRepository.save(wish);
   }
 
-  findAll() {
-    return `This action returns all wishes`;
+  async findAll(id: number): Promise<Wish[]> {
+    return await this.wishesRepository.find({
+      relations: {
+        owner: true,
+      },
+      where: {
+        owner: { id },
+      }
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} wish`;
+  async findOne(id: number): Promise<Wish> {
+    const wish = await this.wishesRepository.findOneBy({ id });
+
+    if (!wish) throw new NotFoundException;
+
+    return ;wish;
   }
 
-  update(id: number, updateWishDto: UpdateWishDto) {
-    return `This action updates a #${id} wish`;
+  async update(id: number, updateWishDto: UpdateWishDto) {
+    const wish = await this.wishesRepository.findOneBy({ id });
+
+    if (!wish) throw new NotFoundException;
+
+    return await this.wishesRepository.update(id, updateWishDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} wish`;
+  async remove(id: number) {
+    const wish = await this.wishesRepository.findOneBy({ id });
+
+    if (!wish) throw new NotFoundException;
+
+    return await this.wishesRepository.delete(id);
   }
 }

@@ -11,29 +11,29 @@ import { NotFoundEception } from 'src/exceptions/not-found.exception';
 export class UsersService {
   constructor(
     @InjectRepository(User)
-    private userRepository: Repository<User>,
+    private usersRepository: Repository<User>,
   ) {}
 
   async create(user: CreateUserDto): Promise<User> {
     const { email, username } = user;
-    const isEmailExist = await this.userRepository.findBy({
+    const isEmailExist = await this.usersRepository.findBy({
       email, 
     })
-    const isUsernameExist = await this.userRepository.findBy({
+    const isUsernameExist = await this.usersRepository.findBy({
       username
     })
 
     if (isEmailExist || isUsernameExist) throw new UserAlreadyExistsEception;
 
-    return await this.userRepository.save(user);
+    return await this.usersRepository.save(user);
   }
 
   async findAll(): Promise<User[]> {
-    return this.userRepository.find();
+    return this.usersRepository.find();
   }
 
-  async findOne(id: number) {
-    const user = await this.userRepository.findOneBy({ id });
+  async findOne(id: number): Promise<User> {
+    const user = await this.usersRepository.findOneBy({ id });
 
     if (!user) throw new UserAlreadyExistsEception;
 
@@ -41,18 +41,18 @@ export class UsersService {
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
-    const user = await this.userRepository.findOneBy({ id });
+    const user = await this.usersRepository.findOneBy({ id });
 
     if (!user) throw new NotFoundEception;
 
-    return await this.userRepository.update(id, updateUserDto);
+    return await this.usersRepository.update(id, updateUserDto);
   }
 
   async remove(id: number) {
-    const user = await this.userRepository.findOneBy({ id });
+    const user = await this.usersRepository.findOneBy({ id });
 
     if (!user) throw new NotFoundEception;
 
-    return await this.userRepository.delete(id);
+    return await this.usersRepository.delete(id);
   }
 }
