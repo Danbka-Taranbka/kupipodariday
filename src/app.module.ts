@@ -10,25 +10,45 @@ import { OffersModule } from './offers/offers.module';
 import { WishesModule } from './wishes/wishes.module';
 import { Offer } from './offers/entities/offer.entity';
 import { Wishlist } from './wishlists/entities/wishlist.entity';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import configuration from './config/configuration';
+import { WinstonModule } from 'nest-winston';
+import { AuthService } from './auth/auth.service';
+import { AuthController } from './auth/auth.controller';
+import { AuthModule } from './auth/auth.module';
+import * as winston from 'winston';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'student',
-      password: 'student',
-      database: 'kupipodariday',
-      entities: [User, Wish, Offer, Wishlist],
-      synchronize: true,
+    WinstonModule.forRoot({
+      levels: {
+        critical_error: 0,
+        error: 1,
+        special_warning: 2,
+        another_log_level: 3,
+        info: 4,
+      },
+      transports: [
+        new winston.transports.Console({ format: winston.format.simple() }),
+        new winston.transports.File({ filename: 'error.log', level: 'error' }),
+      ],
+    }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [configuration],
+    }),
+    TypeOrmModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) =>
+        configService.get('database'),
     }),
     UsersModule,
+    WishesModule,
     WishlistsModule,
     OffersModule,
-    WishesModule,
+    AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [],
 })
 export class AppModule {}

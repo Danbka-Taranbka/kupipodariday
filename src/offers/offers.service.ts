@@ -1,26 +1,58 @@
 import { Injectable } from '@nestjs/common';
 import { CreateOfferDto } from './dto/create-offer.dto';
 import { UpdateOfferDto } from './dto/update-offer.dto';
+import { Offer } from './entities/offer.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { NotFoundEception } from 'src/exceptions/not-found.exception';
 
 @Injectable()
 export class OffersService {
-  create(createOfferDto: CreateOfferDto) {
-    return 'This action adds a new offer';
+  constructor (
+    @InjectRepository(Offer) 
+    private offersRepository: Repository<Offer>,
+  ) {}
+
+  async create(createOfferDto: CreateOfferDto, ownerId: number): Promise<Offer> {
+    const offer = await this.offersRepository.create({
+      ...createOfferDto,
+      user: {id: ownerId}
+    })
+    return await this.offersRepository.save(offer);
   }
 
-  findAll() {
-    return `This action returns all offers`;
+  async findAll(id: number): Promise<Offer[]> {
+    return await this.offersRepository.find({
+      relations: {
+        user: true
+      },
+      where: {
+        user: { id },
+      }
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} offer`;
+  async findOne(id: number): Promise<Offer> {
+    const offer = await this.offersRepository.findOneBy({ id });
+
+    if (!offer) throw new NotFoundEception;
+
+    return offer;
   }
 
-  update(id: number, updateOfferDto: UpdateOfferDto) {
-    return `This action updates a #${id} offer`;
+  async update(id: number, updateOfferDto: UpdateOfferDto) {
+    const offer = await this.offersRepository.findOneBy({ id });
+
+    if (!offer) throw new NotFoundEception;
+
+    return await this.offersRepository.update(id, updateOfferDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} offer`;
+  async remove(id: number) {
+    const offer = await this.offersRepository.findOneBy({ id });
+
+    if (!offer) throw new NotFoundEception;
+
+    return await this.offersRepository.delete(id);
   }
 }
