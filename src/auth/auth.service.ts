@@ -14,7 +14,14 @@ export class AuthService {
   auth(user: User) {
     const payload = {sub: user.id};
 
-    return { acces_token: this.jwtService.sign(payload) };
+    return { 
+      acces_token: this.jwtService.sign(
+        payload, 
+        {
+          expiresIn: '1d',
+        }
+      ), 
+    };
   }
 
   async validatePassword(username: string, pass: string) {
@@ -24,7 +31,7 @@ export class AuthService {
       const isMatched = await bcrypt.compare(pass, user.password);
       const { password, ...result } = user;
 
-      return isMatched ? result : user;
+      return isMatched ? result : null;
     }
 
     return null;

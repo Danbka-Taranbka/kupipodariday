@@ -28,12 +28,14 @@ export class UsersService {
 
     const hash = bcrypt.hash(password, 10);
 
-    const user = await this.usersRepository.create({
+    const user = this.usersRepository.create({
       ...createUserDto,
       password: hash
     });
 
-    return await this.usersRepository.save(user);
+    await this.usersRepository.insert(user);
+
+    return user;
   };
 
   async findAll(): Promise<User[]> {

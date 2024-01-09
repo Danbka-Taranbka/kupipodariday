@@ -3,8 +3,9 @@ import { UsersService } from 'src/users/users.service';
 import { AuthService } from './auth.service';
 import { LocalGuard } from 'src/guards/local.guard';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
+import { RequestWithUser } from 'src/utils/types';
 
-@Controller('auth')
+@Controller()
 export class AuthController {
   constructor(
     private usersService: UsersService,
@@ -13,7 +14,7 @@ export class AuthController {
 
   @UseGuards(LocalGuard)
   @Post('signin')
-  signin(@Req() req) {
+  signin(@Req() req: RequestWithUser) {
     return this.authService.auth(req.user);
   }
 
