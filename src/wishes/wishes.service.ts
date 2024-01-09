@@ -52,56 +52,46 @@ export class WishesService {
 
   // Get a wish by id
   async findOne(id: number): Promise<Wish> {
-    const wish = await this.wishesRepository.findOneBy({ id });
+    const wish = await this.wishesRepository.findOne({
+      where: {
+        id,
+      },
+      relations: {
+        owner: true,
+        offers: {
+          user: true,
+        },
+      }
+    });
 
-    if (!wish) throw new NotFoundException;
+    if (!wish) throw new NotFoundException();
 
     return wish;
   }
 
   // Edit a wish
   async update(id: number, updateWishDto: UpdateWishDto) {
-    const wish = await this.wishesRepository.findOneBy({ id });
+    const wish = await this.wishesRepository.findOne({ 
+      where:{
+        id
+      },
+      relations: {
+        owner: true,
+        offers: true
+      } 
+    });
 
-    if (!wish) throw new NotFoundException;
+    if (!wish) throw new NotFoundException();
 
-    const queryRunner = this.dataSource.createQueryRunner();
-    
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-
-    const newWish = { 
-      ...updateWishDto
-    };
-
-    try {
-      await this.wishesRepository.update(id, newWish);
-    } catch (err) {
-      await queryRunner.rollbackTransaction();
-    } finally {
-      await queryRunner.release();
-    }
-
-    return await this.wishesRepository.findOneBy({ id });
+    return await this.wishesRepository.update(id, updateWishDto);
   }
 
   async remove(id: number) {
     const wish = await this.wishesRepository.findOneBy({ id });
 
-    if (!wish) throw new NotFoundException;
+    if (!wish) throw new NotFoundException();
 
-    const queryRunner = this.dataSource.createQueryRunner();
-    
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-
-    try {
-      await this.wishesRepository.delete(id);
-    } catch (err) {
-      await queryRunner.rollbackTransaction();
-    } finally {
-      await queryRunner.release();
-    }
+    return await this.wishesRepository.delete(id);
   }
   
   async copyWish(userId: number, wishId: number) {
@@ -114,7 +104,7 @@ export class WishesService {
       } 
     });
 
-    const wishExists = await this.wishesRepository.find({
+    const wishExists = await this.wishesRepository.findOne({
       where: {
         owner: {
           id: userId,
@@ -126,7 +116,7 @@ export class WishesService {
       },
     });
 
-    if (wishExists) throw new WishAlreadyExistsEception;
+    if (wishExists) throw new WishAlreadyExistsEception();
 
     const queryRunner = this.dataSource.createQueryRunner();
     
@@ -149,10 +139,14 @@ export class WishesService {
       await this.wishesRepository.save(wish);
       await this.wishesRepository.create(newWish);
       await this.wishesRepository.save(newWish);
+
+      await queryRunner.commitTransaction();
+      return newWish;
     } catch (err) {
       await queryRunner.rollbackTransaction();
+      return err.detail;
     } finally {
       await queryRunner.release();
     }
   }
-}
+};

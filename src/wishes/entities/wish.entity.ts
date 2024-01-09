@@ -40,14 +40,14 @@ export class Wish {
   @Column()
   price: number;
 
-  @Column()
+  @Column({default: 0})
   raised: number;
 
   @Column()
   @Length(1, 1024)
   description: string;
 
-  @Column()
+  @Column({default: 0})
   copied: number;
 
   @ManyToOne(() => User, (user) => user.wishes)
