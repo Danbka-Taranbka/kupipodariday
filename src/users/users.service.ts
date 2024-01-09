@@ -26,11 +26,11 @@ export class UsersService {
 
     if (isEmailExist || isUsernameExist) throw new UserAlreadyExistsEception;
 
-    const hash = bcrypt.hash(password, 10);
+    const hash = await bcrypt.hash(password, 10);
 
     const user = this.usersRepository.create({
       ...createUserDto,
-      password: hash
+      password: hash,
     });
 
     await this.usersRepository.insert(user);

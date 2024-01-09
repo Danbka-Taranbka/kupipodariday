@@ -5,8 +5,7 @@ import { UsersModule } from './users/users.module';
 import { WishlistsModule } from './wishlists/wishlists.module';
 import { OffersModule } from './offers/offers.module';
 import { WishesModule } from './wishes/wishes.module';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import configuration from './config/configuration';
+import { ConfigModule } from '@nestjs/config';
 import { WinstonModule } from 'nest-winston';
 import { AuthModule } from './auth/auth.module';
 import * as winston from 'winston';
@@ -37,7 +36,7 @@ import { Offer } from './offers/entities/offer.entity';
 			port: 5432,
 			username: 'student',
 			password: 'student',
-			database: 'nest_project',
+			database: 'kupipodariday',
 			entities: [User, Wish, Wishlist, Offer],
 			synchronize: true
     }),
