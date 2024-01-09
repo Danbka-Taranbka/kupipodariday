@@ -12,15 +12,13 @@ export class AuthService {
   ) {}
 
   auth(user: User) {
-    const payload = {sub: user.id};
-
-    return { 
-      acces_token: this.jwtService.sign(
-        payload, 
+    return {
+      access_token: this.jwtService.sign(
+        { sub: user.id },
         {
           expiresIn: '1d',
-        }
-      ), 
+        },
+      ),
     };
   }
 

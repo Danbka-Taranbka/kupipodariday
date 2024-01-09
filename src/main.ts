@@ -15,6 +15,6 @@ async function bootstrap() {
   app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
   app.use(cookieParser());
 
-  await app.listen(port);
+  await app.listen(3000);
 }
 bootstrap();
