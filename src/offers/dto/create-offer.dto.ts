@@ -1,19 +1,15 @@
-import { IsBoolean, IsNumber, Min, ValidateNested } from "class-validator";
-import { User } from "src/users/entities/user.entity";
-import { Wish } from "src/wishes/entities/wish.entity";
+import { IsBoolean, IsNumber, IsOptional, Min } from "class-validator";
 
 export class CreateOfferDto {
   
-  @IsNumber()
   @Min(1)
+  @IsNumber()
   amount: number;
 
+  @IsOptional()
   @IsBoolean()
   hidden: boolean;
 
-  @ValidateNested()
-  user: User;
-
-  @ValidateNested()
-  item: Wish;
+  @IsNumber()
+  itemId: number;
 }
