@@ -1,34 +1,39 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UseGuards } from '@nestjs/common';
 import { WishlistsService } from './wishlists.service';
 import { CreateWishlistDto } from './dto/create-wishlist.dto';
 import { UpdateWishlistDto } from './dto/update-wishlist.dto';
+import { JwtGuard } from 'src/guards/jwt.guard';
+import { Wishlist } from './entities/wishlist.entity';
+import { RequestWithUser } from 'src/utils/types';
 
-@Controller('wishlists')
+@UseGuards(JwtGuard)
+@Controller('wishlistlists')
 export class WishlistsController {
   constructor(private readonly wishlistsService: WishlistsService) {}
 
   @Post()
-  create(@Body() createWishlistDto: CreateWishlistDto, @Req() req) {
-    return this.wishlistsService.create(createWishlistDto, +req.owner.id);
+  create(@Body() createWishlistDto: CreateWishlistDto, @Req() req): Promise<Wishlist> {
+    return this.wishlistsService.create(createWishlistDto, req.user.id);
   }
 
   @Get()
-  findAll(@Req() req) {
-    return this.wishlistsService.findAll(+req.owner.id);
+  findAll() {
+    return this.wishlistsService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.wishlistsService.findOne(+id);
+  findOne(@Param('id') id: number): Promise<Wishlist> {
+    return this.wishlistsService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateWishlistDto: UpdateWishlistDto) {
-    return this.wishlistsService.update(+id, updateWishlistDto);
+  update(@Req() req: RequestWithUser, @Param('id') wishlistId: number, @Body() updateWishlistDto: UpdateWishlistDto) {
+    return this.wishlistsService.update(req.user.id, wishlistId, updateWishlistDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.wishlistsService.remove(+id);
+  remove(@Req() req: RequestWithUser, @Param('id') id: number) {
+    console.log(req.user);
+    return this.wishlistsService.remove(req.user.id, id);
   }
 }

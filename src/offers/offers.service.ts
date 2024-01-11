@@ -27,16 +27,6 @@ export class OffersService {
       relations: {
         owner: true,
       },
-      select: {
-        owner: {
-          id: true,
-          username: true,
-          about: true,
-          avatar: true,
-          createdAt: true,
-          updatedAt: true,
-        }
-      }
     });
 
     if (!wish) throw new NotFoundException('There is no wish with such id!');
@@ -50,22 +40,22 @@ export class OffersService {
     
     await queryRunner.connect();
     await queryRunner.startTransaction();
-    wish.raised+=amount;
 
-    if (wish.raised > wish.price) throw new ForbiddenException(`Only ${-(wish.price - amount)} left to raise!`);
-
+    console.log(user);
     try {
+      wish.raised+=amount;
+      if (wish.raised > wish.price) throw new ForbiddenException(`Only ${-(wish.price - amount)} left to raise!`);
+      
       await this.wishesRepository.save(wish);
 
       const newOffer = await this.offersRepository.save({
         amount,
         hidden,
         item: wish,
-        user: user
+        user
       });
 
       await queryRunner.commitTransaction();
-      console.log(newOffer);
       return newOffer;
     } catch (err) {
       await queryRunner.rollbackTransaction();

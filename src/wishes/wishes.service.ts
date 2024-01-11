@@ -26,16 +26,8 @@ export class WishesService {
     return this.wishesRepository.find({
       relations: {
         owner: true,
-      },
-      select: {
-        owner: {
-          id: true,
-          username: true,
-          about: true,
-          avatar: true,
-          createdAt: true,
-          updatedAt: true,
-        },
+        wishlists: true,
+        offers: true
       },
     });
   }
@@ -75,6 +67,7 @@ export class WishesService {
         offers: {
           user: true,
         },
+        wishlists: true
       },
     });
 

@@ -1,22 +1,18 @@
-import { IsOptional, IsUrl, Length, ValidateNested } from "class-validator";
-import { User } from "src/users/entities/user.entity";
-import { Wish } from "src/wishes/entities/wish.entity";
+import { Transform } from "class-transformer";
+import { IsOptional, IsUrl, Length } from "class-validator";
 
 export class CreateWishlistDto {
 
   @Length(1, 250)
   name: string;
 
-  @Length(0, 1500)
-  @IsOptional()
-  description: string;
-
   @IsUrl()
   image: string;
 
-  @ValidateNested()
-  items: Wish[];
+  @Transform((params) => (params.value?.length > 0 ? params.value : undefined))
+  @Length(1, 1500)
+  @IsOptional()
+  description: string;
 
-  @ValidateNested()
-  owner: User;
+  itemsId: number[];
 }

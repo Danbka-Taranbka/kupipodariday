@@ -16,7 +16,7 @@ export class OffersController {
     return this.offersService.create(createOfferDto, req.user);
   }
 
-  /*@Get()
+  @Get()
   findAll(): Promise<Offer[]> {
     return this.offersService.findAll();
   }
@@ -24,5 +24,5 @@ export class OffersController {
   @Get(':id')
   findOne(@Param('id') id: number): Promise<Offer | object> {
     return this.offersService.findOne(id);
-  }*/
+  }
 }

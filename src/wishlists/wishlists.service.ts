@@ -1,56 +1,124 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateWishlistDto } from './dto/create-wishlist.dto';
 import { UpdateWishlistDto } from './dto/update-wishlist.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Wishlist } from './entities/wishlist.entity';
 import { Repository } from 'typeorm';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class WishlistsService {
   constructor(
     @InjectRepository(Wishlist)
     private wishlistsRepository: Repository<Wishlist>,
+    @InjectRepository(User)
+    private usersRepository: Repository<User>, 
   ) {}
 
-  async create(createWishlistDto: CreateWishlistDto, ownerId: number): Promise<Wishlist> {
-    const wishlist = await this.wishlistsRepository.create({
-      ...createWishlistDto,
-      owner: {id: ownerId},
-    })
-    return await this.wishlistsRepository.save(wishlist);
+  async create(createWishlistDto: CreateWishlistDto, id: number): Promise<Wishlist> {
+    const { name, image, itemsId } = createWishlistDto;
+
+    const owner = await this.usersRepository.findOne({
+      where: {
+        id
+      },
+      relations: {
+        wishes: true,
+        wishlists: true,
+      }
+    });
+
+    const wishes = itemsId.map(itemId => owner.wishes.find(item => item.id === itemId));
+
+    const newWishlist = await this.wishlistsRepository.create({
+      name,
+      image,
+      items: wishes,
+      owner
+    });
+    console.log(newWishlist);
+    return await this.wishlistsRepository.save(newWishlist);
   }
 
-  async findAll(id: number): Promise<Wishlist[]> {
-    return await this.wishlistsRepository.find({
+  async findAll(): Promise<Wishlist[]> {
+    return this.wishlistsRepository.find({
       relations: {
         owner: true,
-      },
-      where: {
-        owner: { id }
+        items: true
       }
     });
   }
 
   async findOne(id: number): Promise<Wishlist> {
-    const wishlist = await this.wishlistsRepository.findOneBy({ id });
+    const wishlist = await this.wishlistsRepository.findOne({
+      where: {
+        id
+      },
+      relations: {
+        items: true,
+        owner: true,
+      }
+    });
 
-    if (!wishlist) throw new NotFoundException;
+    if (!wishlist) throw new NotFoundException('There is no such wishlist!');
 
     return wishlist; 
   }
 
-  async update(id: number, updateWishlistDto: UpdateWishlistDto) {
-    const wishlist = await this.wishlistsRepository.findOneBy({ id });
+  async update(userId: number, wishlistId: number, updateWishlistDto: UpdateWishlistDto): Promise<Wishlist> {
+    
+    if (!await this.verifyOwner(userId, wishlistId)) {
+      throw new ForbiddenException('You are not allowed to edit other user\'s wishlists!');
+    };
 
-    if (!wishlist) throw new NotFoundException;
+    const { itemsId, description, name } = updateWishlistDto;
+    const items = itemsId.map((id) => ({id}));
 
-    return await this.wishlistsRepository.update(id, updateWishlistDto);
+    await this.wishlistsRepository.save({
+      id: wishlistId,
+      description,
+      name,
+      items
+    });
+
+    return await this.wishlistsRepository.findOne({
+      where: {id: wishlistId},
+      relations: {
+        owner: true,
+        items: true,
+      }
+    });
   }
 
-  async remove(id: number) {
-    const wishlist = await this.wishlistsRepository.findOneBy({ id });
+  async verifyOwner(userId: number, wishListId: number): Promise<boolean> {
+    const wishList = await this.wishlistsRepository.findOne({
+      where: {
+        id: wishListId,
+      },
+      select: {
+        owner: {          
+          id: true,
+          username: true,
+          about: true,
+          avatar: true,
+          createdAt: true,
+          updatedAt: true,
+        }
+      },
+      relations: {
+        owner: true,
+      }
+    })
 
-    if (!wishlist) throw new NotFoundException;
+    return wishList.owner.id === userId;
+  }
+
+  async remove(userId: number, id: number) {
+    const wishList = await this.wishlistsRepository.findOneBy({id});
+    if (!wishList) throw new NotFoundException('There is no wishlist with such id!');
+    if (!await this.verifyOwner(userId, id)) {
+      throw new ForbiddenException('You are not allowed to remove other user\'s wishlists!');
+    }
 
     return await this.wishlistsRepository.delete(id);
   }
