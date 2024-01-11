@@ -1,12 +1,11 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcryptjs';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
-import { UserAlreadyExistsEception } from 'src/exceptions/user-exist.exception';
-import { NotFoundEception } from 'src/exceptions/not-found.exception';
+import { UserAlreadyExistsException } from 'src/exceptions/user-exist.exception';
 import { Wish } from 'src/wishes/entities/wish.entity';
 
 @Injectable()
@@ -31,7 +30,7 @@ export class UsersService {
   
       return user;
     } catch(err) {
-      throw new UserAlreadyExistsEception();
+      throw new UserAlreadyExistsException();
     }
   };
 
@@ -43,7 +42,7 @@ export class UsersService {
   async findOne(id: number): Promise<User> {
     const user = await this.usersRepository.findOneBy({ id });
 
-    if (!user) throw new NotFoundEception;
+    if (!user) throw new NotFoundException('There is no user with such id!');
 
     return user;
   };
@@ -110,7 +109,7 @@ export class UsersService {
   async remove(id: number) {
     const user = await this.usersRepository.findOneBy({ id });
 
-    if (!user) throw new NotFoundEception;
+    if (!user) throw new NotFoundException('There is no user with such id!');
 
     return await this.usersRepository.delete(id);
   };

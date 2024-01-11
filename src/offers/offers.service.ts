@@ -1,10 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateOfferDto } from './dto/create-offer.dto';
 import { UpdateOfferDto } from './dto/update-offer.dto';
 import { Offer } from './entities/offer.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { NotFoundEception } from 'src/exceptions/not-found.exception';
 
 @Injectable()
 export class OffersService {
@@ -35,7 +34,7 @@ export class OffersService {
   async findOne(id: number): Promise<Offer> {
     const offer = await this.offersRepository.findOneBy({ id });
 
-    if (!offer) throw new NotFoundEception;
+    if (!offer) throw new NotFoundException();
 
     return offer;
   }
@@ -43,7 +42,7 @@ export class OffersService {
   async update(id: number, updateOfferDto: UpdateOfferDto) {
     const offer = await this.offersRepository.findOneBy({ id });
 
-    if (!offer) throw new NotFoundEception;
+    if (!offer) throw new NotFoundException();
 
     return await this.offersRepository.update(id, updateOfferDto);
   }
@@ -51,7 +50,7 @@ export class OffersService {
   async remove(id: number) {
     const offer = await this.offersRepository.findOneBy({ id });
 
-    if (!offer) throw new NotFoundEception;
+    if (!offer) throw new NotFoundException();
 
     return await this.offersRepository.delete(id);
   }
