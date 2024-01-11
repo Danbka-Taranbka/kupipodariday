@@ -51,9 +51,4 @@ export class UsersController {
   findUserWishes(@Param('username') username: string): Promise<Wish[]> {
     return this.usersService.findUserWishes(username);
   }
-
-  @Get()
-  findAll(): Promise<User[]> {
-    return this.usersService.findAll();
-  }
 }

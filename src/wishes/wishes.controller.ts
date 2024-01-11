@@ -4,6 +4,7 @@ import { CreateWishDto } from './dto/create-wish.dto';
 import { UpdateWishDto } from './dto/update-wish.dto';
 import { RequestWithUser } from 'src/utils/types';
 import { JwtGuard } from 'src/guards/jwt.guard';
+import { Wish } from './entities/wish.entity';
 
 @Controller('wishes')
 export class WishesController {
@@ -13,6 +14,11 @@ export class WishesController {
   @Post()
   create(@Body() createWishDto: CreateWishDto, @Req() req) {
     return this.wishesService.create(createWishDto, +req.user.id);
+  }
+
+  @Get()
+  findAll(): Promise<Wish[]> {
+    return this.wishesService.findAll();
   }
 
   // Get 40 last wishes
@@ -36,14 +42,14 @@ export class WishesController {
   // Edit a wish
   @UseGuards(JwtGuard)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateWishDto: UpdateWishDto) {
-    return this.wishesService.update(+id, updateWishDto);
+  update(@Req() req: RequestWithUser, @Param('id') id: string, @Body() updateWishDto: UpdateWishDto) {
+    return this.wishesService.update(req.user.id, +id, updateWishDto);
   }
 
   @UseGuards(JwtGuard)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.wishesService.remove(+id);
+  remove(@Req() req: RequestWithUser, @Param('id') id: string) {
+    return this.wishesService.remove(req.user.id, +id);
   }
 
   @UseGuards(JwtGuard)
