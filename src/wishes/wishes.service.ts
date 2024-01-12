@@ -73,6 +73,7 @@ export class WishesService {
 
     if (!wish) throw new NotFoundException('There is no wish with such id!');
 
+    console.log(wish.offers);
     return wish;
   }
 

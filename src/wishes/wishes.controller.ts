@@ -35,8 +35,8 @@ export class WishesController {
 
   @UseGuards(JwtGuard)
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.wishesService.findOne(+id);
+  findOne(@Param('id') id: number) {
+    return this.wishesService.findOne(id);
   }
 
   // Edit a wish

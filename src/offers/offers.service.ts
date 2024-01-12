@@ -1,6 +1,5 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateOfferDto } from './dto/create-offer.dto';
-import { UpdateOfferDto } from './dto/update-offer.dto';
 import { Offer } from './entities/offer.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
@@ -26,6 +25,7 @@ export class OffersService {
       },
       relations: {
         owner: true,
+        offers: true
       },
     });
 
@@ -37,11 +37,9 @@ export class OffersService {
     if (raised >= price) throw new ForbiddenException('Other users have already raised enough money!');
 
     const queryRunner = this.dataSource.createQueryRunner();
-    
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
-    console.log(user);
     try {
       wish.raised+=amount;
       if (wish.raised > wish.price) throw new ForbiddenException(`Only ${-(wish.price - amount)} left to raise!`);
@@ -56,6 +54,7 @@ export class OffersService {
       });
 
       await queryRunner.commitTransaction();
+      console.log(newOffer);
       return newOffer;
     } catch (err) {
       await queryRunner.rollbackTransaction();
