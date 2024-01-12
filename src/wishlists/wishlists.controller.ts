@@ -33,7 +33,6 @@ export class WishlistsController {
 
   @Delete(':id')
   remove(@Req() req: RequestWithUser, @Param('id') id: number) {
-    console.log(req.user);
     return this.wishlistsService.remove(req.user.id, id);
   }
 }

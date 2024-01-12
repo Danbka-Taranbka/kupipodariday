@@ -36,7 +36,6 @@ export class WishlistsService {
       items: wishes,
       owner
     });
-    console.log(newWishlist);
     return await this.wishlistsRepository.save(newWishlist);
   }
 

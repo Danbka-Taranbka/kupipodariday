@@ -54,7 +54,6 @@ export class OffersService {
       });
 
       await queryRunner.commitTransaction();
-      console.log(newOffer);
       return newOffer;
     } catch (err) {
       await queryRunner.rollbackTransaction();

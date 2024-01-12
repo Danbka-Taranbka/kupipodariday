@@ -1,7 +1,6 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateWishlistDto } from './create-wishlist.dto';
-import { IsArray, IsOptional, IsUrl, Length, ValidateNested } from 'class-validator';
-import { Wish } from 'src/wishes/entities/wish.entity';
+import { IsArray, IsOptional, Length } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class UpdateWishlistDto extends PartialType(CreateWishlistDto) {

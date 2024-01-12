@@ -72,16 +72,14 @@ export class WishesService {
     });
 
     if (!wish) throw new NotFoundException('There is no wish with such id!');
-
-    console.log(wish.offers);
     return wish;
   }
 
   // Edit a wish
-  async update(userId: number, id: number, updateWishDto: UpdateWishDto) {
+  async update(userId: number, wishId: number, updateWishDto: UpdateWishDto) {
     const wish = await this.wishesRepository.findOne({ 
       where:{
-        id
+        id: wishId
       },
       relations: {
         owner: true,
@@ -99,14 +97,14 @@ export class WishesService {
       } 
     });
 
-    if (!await this.verifyOwner(userId, id)) {
+    if (!await this.verifyOwner(userId, wishId)) {
       throw new ForbiddenException('You are not allowed to edit other user\'s wishes!');
     };
 
     if (!wish) throw new NotFoundException('There is no wish with such id!');
     if (wish.offers.length !== 0) throw new ForbiddenException('Someone has already funded this wish!');
 
-    return await this.wishesRepository.update(id, updateWishDto);
+    return await this.wishesRepository.update(wishId, updateWishDto);
   }
 
   async remove(userId: number, id: number) {

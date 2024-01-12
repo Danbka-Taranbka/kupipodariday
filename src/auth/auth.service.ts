@@ -12,14 +12,13 @@ export class AuthService {
   ) {}
 
   auth(user: User) {
-    return {
-      access_token: this.jwtService.sign(
-        { sub: user.id },
-        {
-          expiresIn: '1d',
-        },
-      ),
-    };
+    const access_token = this.jwtService.sign(
+      { sub: user.id },
+      {
+        expiresIn: '1d',
+      },
+    );
+    return {access_token: access_token};
   }
 
   async validatePassword(username: string, pass: string) {
