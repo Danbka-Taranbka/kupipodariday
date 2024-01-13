@@ -1,7 +1,7 @@
 {
   "name": "kupipodariday",
   "version": "0.0.1",
-  "description": "",
+  "description": "It's a backend for a small wishlist-service, where you can fund other people's wishes and find sponsors for your own desires!",
   "author": "Danbka-Taranbka",
   "private": true,
   "license": "UNLICENSED",
