@@ -16,7 +16,7 @@ export class OffersService {
     private wishesRepository: Repository<Wish>,
   ) {}
 
-  async create(createOfferDto: CreateOfferDto, user: User): Promise<any> {
+  async create(createOfferDto: CreateOfferDto, user: User): Promise<Offer> {
     const { amount, hidden, itemId } = createOfferDto;
 
     const wish = await this.wishesRepository.findOne({

@@ -17,7 +17,7 @@ export class WishlistsController {
   }
 
   @Get()
-  findAll() {
+  findAll(): Promise<Wishlist[]> {
     return this.wishlistsService.findAll();
   }
 
@@ -27,7 +27,7 @@ export class WishlistsController {
   }
 
   @Patch(':id')
-  update(@Req() req: RequestWithUser, @Param('id') wishlistId: number, @Body() updateWishlistDto: UpdateWishlistDto) {
+  update(@Req() req: RequestWithUser, @Param('id') wishlistId: number, @Body() updateWishlistDto: UpdateWishlistDto): Promise<Wishlist> {
     return this.wishlistsService.update(req.user.id, wishlistId, updateWishlistDto);
   }
 

@@ -2,7 +2,6 @@ import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/co
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import * as bcrypt from 'bcryptjs';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { UserAlreadyExistsException } from 'src/exceptions/user-exist.exception';
@@ -60,14 +59,16 @@ export class UsersService {
     return result;
   };
 
-  async findByUsername(username: string) {
+  async findByUsername(username: string): Promise<User> {
     const user = await this.usersRepository.findOneBy({ username });
 
     return user;
   };
 
-  async findByEmail(email: string) {
-    const user = await this.usersRepository.findBy({ email });
+  async findByEmail(email: string): Promise<User> {
+    const user = await this.usersRepository.findOne({ 
+      where: {email} 
+    });
 
     return user;
   };
@@ -99,7 +100,7 @@ export class UsersService {
   async update(user: User, updateUserDto: UpdateUserDto) {
     try {
       if (updateUserDto.password) {
-        updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
+        updateUserDto.password = await this.hashService.hash(updateUserDto.password);
       }
     } catch(err) {
       throw new UnauthorizedException();

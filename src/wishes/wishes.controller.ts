@@ -12,7 +12,7 @@ export class WishesController {
 
   @UseGuards(JwtGuard)
   @Post()
-  create(@Body() createWishDto: CreateWishDto, @Req() req) {
+  create(@Body() createWishDto: CreateWishDto, @Req() req): Promise<Wish> {
     return this.wishesService.create(createWishDto, +req.user.id);
   }
 
@@ -23,19 +23,19 @@ export class WishesController {
 
   // Get 40 last wishes
   @Get('last')
-  getLastWishes() {
+  getLastWishes(): Promise<Wish[]> {
     return this.wishesService.getLastWishes();
   }
 
   // Get 20 top wishes
   @Get('top')
-  getTopWishes() {
+  getTopWishes(): Promise<Wish[]> {
     return this.wishesService.getTopWishes();
   }
 
   @UseGuards(JwtGuard)
   @Get(':id')
-  findOne(@Param('id') id: number) {
+  findOne(@Param('id') id: number): Promise<Wish> {
     return this.wishesService.findOne(id);
   }
 
@@ -54,7 +54,7 @@ export class WishesController {
 
   @UseGuards(JwtGuard)
   @Post(':id/copy')
-  copyWish(@Param('id') id: number, @Req() req: RequestWithUser) {
+  copyWish(@Param('id') id: number, @Req() req: RequestWithUser): Promise<Wish> {
     return this.wishesService.copyWish(req.user.id, +id);
   }
 }

@@ -11,7 +11,7 @@ export class OffersController {
   constructor(private readonly offersService: OffersService) {}
 
   @Post()
-  create(@Req() req: RequestWithUser, @Body() createOfferDto: CreateOfferDto) {
+  create(@Req() req: RequestWithUser, @Body() createOfferDto: CreateOfferDto): Promise<Offer> {
     return this.offersService.create(createOfferDto, req.user);
   }
 
