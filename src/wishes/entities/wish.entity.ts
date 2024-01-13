@@ -1,4 +1,4 @@
-import { IsUrl, Length } from "class-validator";
+import { IsInt, IsNotEmpty, IsNumber, IsString, IsUrl, Length } from "class-validator";
 import { Offer } from "src/offers/entities/offer.entity";
 import { User } from "src/users/entities/user.entity";
 import { Wishlist } from "src/wishlists/entities/wishlist.entity";
@@ -27,27 +27,37 @@ export class Wish {
 
   @Column()
   @Length(1, 250)
+  @IsString()
+  @IsNotEmpty()
   name: string;
 
   @Column()
   @IsUrl()
+  @IsNotEmpty()
   link: string;
   
   @Column()
   @IsUrl()
+  @IsNotEmpty()
   image: string;
 
   @Column()
+  @IsNumber()
+  @IsNotEmpty()
   price: number;
 
   @Column({default: 0})
+  @IsNumber()
   raised: number;
 
   @Column()
-  @Length(1, 1024)
+  @IsNotEmpty()
+  @Length(1, 1024, {message: 'Description must be 1 - 1024 symbols long!'})
+  @IsString()
   description: string;
 
   @Column({default: 0})
+  @IsInt()
   copied: number;
 
   @ManyToOne(() => User, (user) => user.wishes)

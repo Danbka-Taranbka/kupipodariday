@@ -40,10 +40,10 @@ export class OffersService {
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
-    try {
-      wish.raised+=amount;
-      if (wish.raised > wish.price) throw new ForbiddenException(`Only ${-(wish.price - amount)} left to raise!`);
-      
+    wish.raised+=amount;
+    if (wish.raised > wish.price) throw new ForbiddenException(`Only ${price - raised} left to raise!`);
+
+    try {      
       await this.wishesRepository.save(wish);
 
       const newOffer = await this.offersRepository.save({

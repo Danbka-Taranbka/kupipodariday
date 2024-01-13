@@ -1,3 +1,4 @@
+import { IsBoolean, IsInt, IsNotEmpty } from "class-validator";
 import { User } from "src/users/entities/user.entity";
 import { Wish } from "src/wishes/entities/wish.entity";
 import { 
@@ -22,16 +23,21 @@ export class Offer {
   updatedAt: Date;
 
   @Column()
+  @IsInt()
+  @IsNotEmpty()
   amount: number;
 
   @Column({
     default: false,
   })
+  @IsBoolean()
   hidden: boolean;
 
   @ManyToOne(() => User, (user) => user.offers)
   user: User;
 
-  @ManyToOne(() => Wish, (wish) => wish.offers)
+  @ManyToOne(() => Wish, (wish) => wish.offers, {
+    onDelete: 'CASCADE',
+  })
   item: Wish;
 }

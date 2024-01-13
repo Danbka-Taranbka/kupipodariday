@@ -3,12 +3,14 @@ import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcryptjs';
+import { HashService } from 'src/hash/hash.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private jwtService: JwtService,
     private usersService: UsersService,
+    private hashService: HashService,
   ) {}
 
   auth(user: User) {
@@ -25,7 +27,7 @@ export class AuthService {
     const user = await this.usersService.findByUsername(username);
 
     if (user) {
-      const isMatched = await bcrypt.compare(pass, user.password);
+      const isMatched = await this.hashService.verify(pass, user.password);
       const { password, ...result } = user;
 
       return isMatched ? result : null;

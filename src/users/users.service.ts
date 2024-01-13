@@ -7,10 +7,12 @@ import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { UserAlreadyExistsException } from 'src/exceptions/user-exist.exception';
 import { Wish } from 'src/wishes/entities/wish.entity';
+import { HashService } from 'src/hash/hash.service';
 
 @Injectable()
 export class UsersService {
   constructor(
+    private hashService: HashService,
     @InjectRepository(User)
     private usersRepository: Repository<User>,
   ) {}
@@ -19,7 +21,7 @@ export class UsersService {
     try {
       const { password, ...rest } = createUserDto;
 
-      const hash = await bcrypt.hash(password, 10);
+      const hash = await this.hashService.hash(password);
 
       const user = this.usersRepository.create({
         ...createUserDto,

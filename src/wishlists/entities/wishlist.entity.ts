@@ -1,4 +1,4 @@
-import { IsOptional, IsUrl, Length } from "class-validator";
+import { IsNotEmpty, IsOptional, IsString, IsUrl, Length } from "class-validator";
 import { User } from "src/users/entities/user.entity";
 import { Wish } from "src/wishes/entities/wish.entity";
 import { 
@@ -26,6 +26,8 @@ export class Wishlist {
 
   @Column()
   @Length(1, 250)
+  @IsString()
+  @IsNotEmpty()
   name: string;
 
   @Column({
@@ -33,10 +35,12 @@ export class Wishlist {
   })
   @Length(1, 1500)
   @IsOptional()
+  @IsString()
   description: string;
 
   @Column()
   @IsUrl()
+  @IsNotEmpty()
   image: string;
 
   @ManyToMany(() => Wish, (wish) => wish.wishlists)
